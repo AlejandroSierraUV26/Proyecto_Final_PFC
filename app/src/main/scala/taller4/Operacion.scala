@@ -21,20 +21,38 @@ object Operacion {
   }
   def reconstuirCadenaIngenuo(n: Int, o: Oraculo): Seq[Char] = {
     val cadenas = generarCadenas(n)
-    val totalelementos = cadenas.length
-    def buscar_cadena(i: Int): Seq[Char] = {
-      if (i == totalelementos) {
+
+    def buscarCadena(cadenasRestantes: Seq[Seq[Char]]): Seq[Char] = {
+      if (cadenasRestantes.isEmpty) {
         Seq()
       } else {
-        val cadena = cadenas(i)
-        if (o(cadena)) {
-          cadena
+        val actual = cadenasRestantes.head
+        if (o(actual)) {
+          actual
         } else {
-          buscar_cadena(i + 1)
+          buscarCadena(cadenasRestantes.tail)
         }
       }
     }
-    buscar_cadena(0)
+
+    buscarCadena(cadenas)
+  }
+  def reconstruirCadenaMejorado(n: Int, o: Oraculo): Seq[Char] = {
+    def reconstruirRecursivo(actual: Seq[Char], longitudActual: Int): Seq[Char] = {
+      if (longitudActual == n && o(actual)) {
+        actual
+      } else if (longitudActual < n) {
+        val siguientes = alfabeto.flatMap(letra => reconstruirRecursivo(actual :+ letra, longitudActual + 1))
+        siguientes
+      } else {
+        Seq()
+      }
+    }
+
+    reconstruirRecursivo(Seq(), 0)
+  }
+  def reconstruirCadenaTurbo(n: Int, o: Seq[Char] => Boolean): Seq[Char] = {
+      Seq('s')
   }
   def main(args: Array[String]): Unit = {
     // Se define el oráculo
@@ -44,9 +62,21 @@ object Operacion {
       secuencia_buscar.containsSlice(s)
     }
     // Se llama a la función
+    println("Solucion ingenua")
     println(s"Generando cadenas de tamaño 4")
     val cadenas = reconstuirCadenaIngenuo(4, o)
     println(s"Cadena encontrada: $cadenas")
-
+    println()
+    println("Solucion mejorada")
+    println(s"Generando cadenas de tamaño 4")
+    val cadenas2 = reconstruirCadenaMejorado(4, o)
+    println(s"Cadena encontrada: $cadenas2")
+    /*
+    println()
+    println("Solucion  turbo mejorada")
+    println(s"Generando cadenas de tamaño 4")
+    val cadenas3 = reconstruirCadenaTurbo(4, o)
+    println(s"Cadena encontrada: $cadenas3")
+     */
   }
 }
