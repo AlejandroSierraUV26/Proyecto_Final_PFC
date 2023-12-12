@@ -53,7 +53,6 @@ object Operacion {
   }
 
   def reconstruirCadenaTurbo(n: Int, o: Oraculo): Seq[Char] = {
-
     var k = 1
     var candidatos = alfabeto.map(Seq(_))
 
@@ -73,14 +72,13 @@ object Operacion {
 
   def main(args: Array[String]): Unit = {
     // Se define el oráculo
-    val tamañoDeseado = 16
+    val tamañoDeseado = 9
     val secuencia_buscar = (1 to tamañoDeseado).map(_ => alfabeto(scala.util.Random.nextInt(alfabeto.length))).mkString("")
 
     val tamaño_secuencia = secuencia_buscar.length
     val o: Oraculo = (s: Seq[Char]) => {
       secuencia_buscar.containsSlice(s)
     }
-    // Se llama a la función
     val inicio = System.nanoTime()
 
     println("Solucion ingenua")
@@ -90,8 +88,9 @@ object Operacion {
 
     val fin = System.nanoTime()
     println()
-    println((fin - inicio) / 1e6)
-    println()
+
+    val tiempo1 = (fin - inicio) / 1e6
+
     println("Solucion mejorada")
 
     val inicio2 = System.nanoTime()
@@ -100,16 +99,20 @@ object Operacion {
     println(s"Cadena encontrada: $cadenas2")
     val fin2 = System.nanoTime()
     println()
-    println((fin2 - inicio2) / 1e6)
-    println()
-    println("Solucion  turbo mejorada")
+    val tiempo2 = (fin2 - inicio2) / 1e6
+
+    println("Solucion  Turbo")
     val inicio3 = System.nanoTime()
     println(s"Generando cadenas de tamaño: $tamaño_secuencia")
     val cadenas3 = reconstruirCadenaTurbo(tamaño_secuencia, o)
     println(s"Cadena encontrada: $cadenas3")
     val fin3 = System.nanoTime()
     println()
-    println((fin3 - inicio3) / 1e6)
-    println()
+    val tiempo3 = (fin3 - inicio3) / 1e6
+
+    println(s"Tiempo de ejecución ingenuo:          $tiempo1 ms")
+    println(s"Tiempo de ejecución mejorado:         $tiempo2 ms")
+    println(s"Tiempo de ejecución turbo:            $tiempo3 ms")
+
   }
 }
