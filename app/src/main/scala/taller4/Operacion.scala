@@ -53,6 +53,33 @@ object Operacion {
   }
 
   def reconstruirCadenaTurbo(n: Int, o: Oraculo): Seq[Char] = {
+      def reconstruirCadenaTurboAux(n: Int, o: Oraculo): Seq[Seq[Char]] ={
+      var k = 1
+      var candidatos = alfabeto.map(Seq(_))
+      while (k < n) {
+        candidatos = candidatos.flatMap { candidato =>alfabeto.map(candidato :+ _)}
+        if (candidatos.isEmpty) Seq() //
+        k += 1
+      }
+      candidatos
+      }
+    def buscar_cadena(cadenasRestantes: Seq[Seq[Char]]): Seq[Char] = {
+      if (cadenasRestantes.isEmpty) {
+        Seq()
+      } else {
+        val actual = cadenasRestantes.head
+        if (o(actual)) {
+          actual
+        } else {
+          buscar_cadena(cadenasRestantes.tail)
+        }
+      }
+    }
+    buscar_cadena(reconstruirCadenaTurboAux(n,o))
+  }
+
+
+  def reconstruirCadenaTurboMejorada(n: Int, o: Oraculo): Seq[Char] = {
     var k = 1
     var candidatos = alfabeto.map(Seq(_))
 
@@ -60,6 +87,7 @@ object Operacion {
       candidatos = candidatos.flatMap { candidato =>
         alfabeto.map(candidato :+ _)
       }.filter(o) // Filtrar las cadenas candidatas con el oráculo
+
       if (candidatos.isEmpty) Seq() // No hay cadenas válidas de longitud k
 
       k += 1 // Duplicar la longitud para la próxima iteración
@@ -70,9 +98,10 @@ object Operacion {
   }
 
 
+
   def main(args: Array[String]): Unit = {
     // Se define el oráculo
-    val tamañoDeseado = 9
+    val tamañoDeseado = 8
     val secuencia_buscar = (1 to tamañoDeseado).map(_ => alfabeto(scala.util.Random.nextInt(alfabeto.length))).mkString("")
 
     val tamaño_secuencia = secuencia_buscar.length
@@ -110,9 +139,19 @@ object Operacion {
     println()
     val tiempo3 = (fin3 - inicio3) / 1e6
 
+    println("Solucion  Turbo Mejorada")
+    val inicio4 = System.nanoTime()
+    println(s"Generando cadenas de tamaño: $tamaño_secuencia")
+    val cadenas4 = reconstruirCadenaTurboMejorada(tamaño_secuencia, o)
+    println(s"Cadena encontrada: $cadenas4")
+    val fin4 = System.nanoTime()
+    println()
+    val tiempo4 = (fin4 - inicio4) / 1e6
+
     println(s"Tiempo de ejecución ingenuo:          $tiempo1 ms")
     println(s"Tiempo de ejecución mejorado:         $tiempo2 ms")
-    println(s"Tiempo de ejecución turbo:            $tiempo3 ms")
+    println(s"Tiempo de ejecución turbo :           $tiempo3 ms")
+    println(s"Tiempo de ejecución turbo mejorado:   $tiempo4 ms")
 
   }
 }
