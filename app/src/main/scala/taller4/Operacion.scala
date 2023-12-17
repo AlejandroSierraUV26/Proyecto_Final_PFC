@@ -1,8 +1,9 @@
 package taller4
 
 import common.task
-import scala.util.Random
+
 import scala.annotation.tailrec
+import scala.util.Random
 
 object Operacion {
   val alfabeto = Seq('a', 'c', 'g', 't')
@@ -58,6 +59,7 @@ object Operacion {
     }
     reconstruirRecursivo(Seq(), 0)
   }
+  @tailrec
   def buscarCadena(cadenasRestantes: Seq[Seq[Char]], o: Oraculo): Seq[Char] = {
     cadenasRestantes match {
       case Nil => Seq()
@@ -121,6 +123,29 @@ object Operacion {
 
     candidatosFinales.find(_.length == n).getOrElse(Seq())
   }
+
+  def reconstruirCadenaTurboMejoradaPar(n: Int, o: Oraculo): Seq[Char] = {
+    def reconstruirCadena(k: Int, candidatos: Seq[Seq[Char]]): Seq[Seq[Char]] = {
+      if (k >= n) {
+        candidatos
+      } else {
+        val tareas = candidatos.flatMap { candidato =>
+          alfabeto.map(letra => task(candidato :+ letra))
+        }
+        val nuevosCandidatos = tareas.map(_.join())
+
+        val candidatosFiltrados = nuevosCandidatos.filter(o)
+        if (candidatosFiltrados.isEmpty) Seq()
+        else reconstruirCadena(k + 1, candidatosFiltrados)
+      }
+    }
+
+    val candidatosIniciales = alfabeto.map(Seq(_))
+    val candidatosFinales = reconstruirCadena(1, candidatosIniciales)
+
+    candidatosFinales.find(_.length == n).getOrElse(Seq())
+  }
+
   def tiempo_funcion(n: Int, o: Oraculo, f: (Int, Oraculo) => Seq[Char]): Double = {
     val inicio = System.nanoTime()
     f(n, o)
@@ -139,13 +164,9 @@ object Operacion {
       n = math.pow(2, i).toInt
       secuencia = (1 to n).map(_ => alfabeto(Random.nextInt(alfabeto.length)))
     } yield {
-        val o: Oraculo = (s: Seq[Char]) => secuencia.containsSlice(s)
-        val (tiempoSecuencial, tiempoParalelo, aceleracion) = compararSecuencialParalela(
-          reconstuirCadenaIngenuo, reconstuirCadenaIngenuoPar)(n, o)
-        print(s"n = $n  |")
-        print(s" $tiempoSecuencial  ")
-        print(s" $tiempoParalelo  ")
-        println(s" $aceleracion")
+      val o: Oraculo = (s: Seq[Char]) => secuencia.containsSlice(s)
+      val tiempo1 = tiempo_funcion(n, o, reconstruirCadenaTurboMejorada)
+      println(s"Tiempo Turbo Mejorada: $tiempo1")
     }
   }
 }
