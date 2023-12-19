@@ -36,7 +36,6 @@ object Operacion {
         actual
       } else if (longitudActual < n) {
         val siguientes = alfabeto.flatMap(letra => reconstruirRecursivo(actual :+ letra, longitudActual + 1))
-
         siguientes
       } else {
         Seq()
